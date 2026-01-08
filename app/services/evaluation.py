@@ -15,10 +15,6 @@ logger = logging.getLogger(__name__)
 class EvaluationService:
     def __init__(self, session: AsyncSession):
         self.repo = EvaluationRepository(session)
-        self.llm_provider = OllamaLLMProvider(
-            model=settings.LLM_MODEL,
-            base_url=settings.LLM_BASE_URL,
-        )
 
     async def create_evaluation(self, data: EvaluationCreate) -> Evaluation:
         return await self.repo.create(data)
@@ -42,7 +38,7 @@ class EvaluationService:
             full_text = "\n".join(text_lines)
             
             try:
-                summary = await self.llm_provider.summarize(full_text)
+                summary = await llm_provider.summarize(full_text)
             except Exception as e:
                 logger.error(f"LLM generation failed: {e}")
                 summary_error = "Summary generation failed. Please try again later."

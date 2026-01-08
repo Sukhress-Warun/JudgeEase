@@ -1,4 +1,3 @@
-# app/services/llm/ollama.py
 from langchain_ollama import ChatOllama
 from app.services.llm.base import LLMProvider
 from app.config.settings import settings
@@ -32,7 +31,6 @@ class OllamaLLMProvider(LLMProvider):
             f"{text}"
         )
 
-        # ChatOllama.invoke() is sync → offload safely
         result = await asyncio.to_thread(self._llm.invoke, prompt)
 
         return result.content.strip()
