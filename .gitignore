@@ -1,0 +1,29 @@
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+.Python
+env
+.env
+venv/
+.venv/
+lib/
+lib64/
+include/
+
+=*.db  # e.g., sqlite databases like test.db
+/htmlcov/
+/.coverage*
+/coverage.xml
+/Pipfile.lock # generally recommended to include in version control, but optional
+/poetry.lock # generally recommended to include in version control, but optional
+
+.idea/  # JetBrains IDEs (PyCharm)
+.vscode/ # VS Code
+
+.DS_Store # macOS
+*~ # temporary files
+
+log.txt
+dist/
+build/
