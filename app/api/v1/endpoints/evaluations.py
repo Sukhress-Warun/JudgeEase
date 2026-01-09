@@ -5,20 +5,11 @@ from app.db.session import get_db
 from app.schemas.evaluation import EvaluationCreate, EvaluationResponse, EvaluationSummary, EvaluationPut
 from app.services.evaluation import EvaluationService
 from app.repositories.evaluation_repo import EvaluationRepository
+from app.dependencies.dependencies import get_service, get_llm_provider
+from app.services.llm.OllamaLLMProvider import OllamaLLMProvider
 
 router = APIRouter()
 
-def get_service(session: AsyncSession = Depends(get_db)) -> EvaluationService:
-    return EvaluationService(session)
-
-from app.services.llm.OllamaLLMProvider import OllamaLLMProvider
-from app.config.settings import settings
-
-def get_llm_provider() -> OllamaLLMProvider:
-    return OllamaLLMProvider(
-        model=settings.LLM_MODEL,
-        base_url=settings.LLM_BASE_URL,
-    )
 
 @router.post("/evaluations", response_model=EvaluationResponse, status_code=status.HTTP_201_CREATED)
 async def create_evaluation(

@@ -4,8 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.api.v1.endpoints import evaluations
 from app.db.session import engine, Base
 from app.exceptions.handlers import database_exception_handler, generic_exception_handler, custom_exception_handler
-from app.exceptions.customExceptions.client_exceptions import CustomException
-
+from app.exceptions.customExceptions.client_exceptions import CustomException, NotFoundError
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

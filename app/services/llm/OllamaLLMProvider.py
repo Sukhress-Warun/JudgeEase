@@ -30,7 +30,11 @@ class OllamaLLMProvider(LLMProvider):
             "Limit it to at most three sentences and do not add introductions or explanations.\n\n"
             f"{text}"
         )
-
-        result = await asyncio.to_thread(self._llm.invoke, prompt)
-
-        return result.content.strip()
+        try:           
+           task = asyncio.to_thread(self._llm.invoke, prompt)
+           result = await asyncio.wait_for(task, timeout=10)
+           return result.content.strip()
+        except TimeoutError:
+           raise Exception("LLM generation timed out")
+        except Exception as e:
+           raise Exception(f"LLM generation failed: {e}")

@@ -12,8 +12,11 @@ async def test_create_evaluation(client: AsyncClient):
     response = await client.post("/api/v1/evaluations", json=payload)
     assert response.status_code == 201
     data = response.json()
-    assert data["contestant_id"] == "c1"
+    for i in payload:
+        assert data[i] == payload[i]
     assert "id" in data
+    assert "created_at" in data
+    assert "updated_at" in data
 
 @pytest.mark.asyncio
 async def test_get_evaluations_with_summary(client: AsyncClient):
@@ -27,7 +30,7 @@ async def test_get_evaluations_with_summary(client: AsyncClient):
     assert response.status_code == 200
     data = response.json()
     assert len(data["evaluations"]) == 2
-    assert data["summary"] == "Mock Summary"  
+    assert data["summary"] == "Mock Summary"
 
 @pytest.mark.asyncio
 async def test_update_evaluation(client: AsyncClient):
@@ -41,6 +44,7 @@ async def test_update_evaluation(client: AsyncClient):
     response = await client.put(f"/api/v1/evaluations/{eval_id}", json=update_payload)
     assert response.status_code == 200
     assert response.json()["score"] == 75
+    assert response.json()["notes"] == "Better"
 
 @pytest.mark.asyncio
 async def test_delete_evaluation(client: AsyncClient):

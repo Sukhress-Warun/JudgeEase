@@ -15,15 +15,19 @@ logger = logging.getLogger(__name__)
 class EvaluationService:
     def __init__(self, session: AsyncSession):
         self.repo = EvaluationRepository(session)
+    
+    @staticmethod
+    def not_found_error(evaluation_id: UUID, res: any) -> any:
+        if not res:
+            raise NotFoundError(f"Evaluation {evaluation_id} not found")
+        return res
 
     async def create_evaluation(self, data: EvaluationCreate) -> Evaluation:
         return await self.repo.create(data)
     
     async def get_evaluation(self, evaluation_id: UUID) -> Evaluation | None:
         res = await self.repo.get(evaluation_id)
-        if not res:
-            raise NotFoundError(f"Evaluation {evaluation_id} not found")
-        return res
+        return self.not_found_error(evaluation_id, res)
 
     async def get_evaluations_for_contestant(self, contestant_id: str, llm_provider: LLMProvider) -> EvaluationSummary:
         evaluations = await self.repo.get_by_contestant(contestant_id)
@@ -40,8 +44,8 @@ class EvaluationService:
             try:
                 summary = await llm_provider.summarize(full_text)
             except Exception as e:
-                logger.error(f"LLM generation failed: {e}")
-                summary_error = "Summary generation failed. Please try again later."
+                logger.error(f"Error while summarizing evaluations: {e}")
+                summary_error = e.args[0]
 
         return EvaluationSummary(
             evaluations=evaluations,
@@ -51,13 +55,9 @@ class EvaluationService:
     
     async def update_evaluation(self, evaluation_id: UUID, data: EvaluationPut) -> Evaluation:
         res = await self.repo.update(evaluation_id, data)
-        if not res:
-            raise NotFoundError(f"Evaluation {evaluation_id} not found")
-        return res
+        return self.not_found_error(evaluation_id, res)
 
     async def delete_evaluation(self, evaluation_id: UUID) -> bool:
         res = await self.repo.delete(evaluation_id)
-        if not res:
-            raise NotFoundError(f"Evaluation {evaluation_id} not found")
-        return res
+        return self.not_found_error(evaluation_id, res)
 
