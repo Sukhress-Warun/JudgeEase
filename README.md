@@ -44,7 +44,8 @@ We use **PostgreSQL** with `SQLAlchemy 2.0` (Async Mode).
 | `updated_at`  | `TIMESTAMP` | —            | Audit timestamp for record update. |
 
 
-### Project Structure: Clean Architecture
+
+## Project Structure: Clean Architecture
 The codebase enforces strict separation of concerns to ensure maintainability and testability:
 - **`app/api/` (Presentation)**: FastAPI routers handling HTTP semantics, status codes, and dependency injection.
 - **`app/services/` (Business Logic)**: Contains `EvaluationService` which orchestrates data fetching and LLM calls. It holds the core logic (e.g., "Don't fail if LLM fails").
@@ -53,20 +54,20 @@ The codebase enforces strict separation of concerns to ensure maintainability an
 - **`app/schemas/`**: Pydantic models for Request/Response validation.
 - **`app/services/llm/`**: **Adapter Pattern** implementation for the LLM.
 
-### Validation Logic
+## Validation Logic
 Data integrity is enforced at the API boundary using **Pydantic**:
 - **Score Integrity**: `score` field is strictly constrained `ge=0, le=100`.
 - **Content Requirements**: `notes`, `contestant_id`, and `judge_id` must be non-empty strings (`min_length=1`).
 - **UUID Validation**: Path parameters are validated as proper UUIDs to prevent database-level type errors.
 
-### External API Design (LLM Integration)
+## External API Design (LLM Integration)
 - **Adapter Pattern**: An abstract `LLMProvider` base class allows seamless switching between local models (Ollama) and cloud APIs (OpenAI/Gemini) via configuration changes, without touching business code.
 - **Timeouts**: To prevent thread starvation, the `OllamaLLMProvider` implements a strict **10-second hard timeout** using `asyncio.wait_for`.
 - **Asynchronous Execution**: The potentially blocking I/O of the LLM call is offloaded to a thread pool (`asyncio.to_thread`) to ensure the main event loop remains non-blocking.
 
 
 
-## 3️⃣ Solution Approach
+## Solution Approach
 
 **Data Flow Walkthrough: `GET /evaluations?contestant_id=123`**
 
@@ -83,7 +84,7 @@ Data integrity is enforced at the API boundary using **Pydantic**:
 
 
 
-## 4️⃣ Error Handling Strategy
+## Error Handling Strategy
 
 The application employs a defensive programming strategy:
 
@@ -110,7 +111,7 @@ The application employs a defensive programming strategy:
 
 
 
-## 5️⃣ How to Run the Project
+##  How to Run the Project
 
 ### Prerequisites
 - Python 3.10+
@@ -172,7 +173,7 @@ curl "http://localhost:8000/api/v1/evaluations?contestant_id=c1"
 
 
 
-## 🧪 Testing
+## Testing
 
 The project maintains a high standard of code quality with a comprehensive `pytest` suite covering positive and negative scenarios.
 
