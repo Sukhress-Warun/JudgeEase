@@ -27,3 +27,4 @@ class EvaluationSummary(BaseModel):
     evaluations: list[EvaluationResponse]
     summary: str | None = None
     summary_error: str | None = None
+    overall_score: int | None = None

@@ -17,7 +17,7 @@ class EvaluationService:
         self.repo = EvaluationRepository(session)
     
     @staticmethod
-    def not_found_error(evaluation_id: UUID, res: any) -> any:
+    def validate_and_return_data(evaluation_id: UUID, res: any) -> any:
         if not res:
             raise NotFoundError(f"Evaluation {evaluation_id} not found")
         return res
@@ -27,18 +27,21 @@ class EvaluationService:
     
     async def get_evaluation(self, evaluation_id: UUID) -> Evaluation | None:
         res = await self.repo.get(evaluation_id)
-        return self.not_found_error(evaluation_id, res)
+        return self.validate_and_return_data(evaluation_id, res)
 
     async def get_evaluations_for_contestant(self, contestant_id: str, llm_provider: LLMProvider) -> EvaluationSummary:
         evaluations = await self.repo.get_by_contestant(contestant_id)
         
         summary = None
         summary_error = None
+        overall_score = 0
+        total_evaluations = len(evaluations)
 
         if evaluations:
             text_lines = []
             for ev in evaluations:
                 text_lines.append(f"Judge {ev.judge_id} (Score: {ev.score}): {ev.notes}")
+                overall_score += ev.score
             full_text = "\n".join(text_lines)
             
             try:
@@ -50,14 +53,15 @@ class EvaluationService:
         return EvaluationSummary(
             evaluations=evaluations,
             summary=summary,
-            summary_error=summary_error
+            summary_error=summary_error,
+            overall_score=overall_score/total_evaluations if total_evaluations > 0 else None
         )
     
     async def update_evaluation(self, evaluation_id: UUID, data: EvaluationPut) -> Evaluation:
         res = await self.repo.update(evaluation_id, data)
-        return self.not_found_error(evaluation_id, res)
+        return self.validate_and_return_data(evaluation_id, res)
 
     async def delete_evaluation(self, evaluation_id: UUID) -> bool:
         res = await self.repo.delete(evaluation_id)
-        return self.not_found_error(evaluation_id, res)
+        return self.validate_and_return_data(evaluation_id, res)
 

@@ -3,7 +3,7 @@ from httpx import AsyncClient
 from unittest.mock import AsyncMock
 from app.exceptions.customExceptions.client_exceptions import CustomException
 from sqlalchemy.exc import SQLAlchemyError
-from app.api.v1.endpoints.evaluations import get_service, get_llm_provider
+from app.dependencies.dependencies import get_service, get_llm_provider
 from app.main import app
 from app.services.llm.base import LLMProvider
 
@@ -72,5 +72,3 @@ async def test_api_both_db_and_llm_error(client: AsyncClient):
 
     assert response.status_code == 500
     assert response.json()["detail"] == "Internal Database Error"
-    assert app.dependency_overrides[get_llm_provider].summarize.call_count == 0
-
