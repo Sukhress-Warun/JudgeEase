@@ -36,14 +36,15 @@ async def test_get_evaluations_llm_failure():
     service.repo.get_by_contestant.return_value = [mock_eval]
     
     mock_provider = AsyncMock()
-    mock_provider.summarize.side_effect = Exception("LLM Timeout")
+    mock_provider.summarize.side_effect = Exception("LLM failure")
 
     result = await service.get_evaluations_for_contestant("c1", mock_provider)
 
+    # Assert gracefull degradation
     assert len(result.evaluations) == 1
     assert result.evaluations[0].judge_id == "j1"
     assert result.summary is None
-    assert result.summary_error == "LLM Timeout"
+    assert result.summary_error == "LLM generation failed"
 
 @pytest.mark.asyncio
 async def test_get_evaluations_llm_timeout():
@@ -70,4 +71,4 @@ async def test_get_evaluations_llm_timeout():
     assert len(result.evaluations) == 1
     assert result.evaluations[0].judge_id == "j1"
     assert result.summary is None
-    assert "Connection timed out" in str(result.summary_error)
+    assert result.summary_error == "LLM generation timed out"

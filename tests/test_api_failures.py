@@ -59,7 +59,7 @@ async def test_api_get_evaluations_llm_error(client: AsyncClient):
     data = response.json()
     assert len(data["evaluations"]) == 1
     assert data["summary"] is None
-    assert "LLM Service Unavailable" in data["summary_error"]
+    assert data["summary_error"] == "LLM generation failed"
 
 @pytest.mark.asyncio
 async def test_api_both_db_and_llm_error(client: AsyncClient):
