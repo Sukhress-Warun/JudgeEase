@@ -46,9 +46,10 @@ class EvaluationService:
             
             try:
                 summary = await llm_provider.summarize(full_text)
+            except TimeoutError as e:
+                summary_error = "LLM generation timed out"
             except Exception as e:
-                logger.error(f"Error while summarizing evaluations: {e}")
-                summary_error = e.args[0]
+                summary_error = "LLM generation failed"
 
         return EvaluationSummary(
             evaluations=evaluations,

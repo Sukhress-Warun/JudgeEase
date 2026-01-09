@@ -7,7 +7,6 @@ from sqlalchemy.pool import StaticPool
 
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 os.environ["LLM_PROVIDER"] = "ollama"
-os.environ["LLM_API_KEY"] = "dummy"
 
 from app.main import app as main_app
 from app.db.session import Base, get_db
